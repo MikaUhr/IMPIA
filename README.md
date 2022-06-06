@@ -14,7 +14,7 @@ In addition, spatial covariance analysis predicts the function of unknown genes.
 ### 
 
 ## Usage
-### Step1: Installation
+### Step2: Installation
 To install IMPIA, you need conda.
 
  1. Clone this repository.
@@ -46,26 +46,50 @@ snakemake --use-conda --conda-frontend conda --configfile config.yaml --core 4
 
 ## Overview of IMPIA steps
 
-### Preprocessing
+### Step1: Metagenome preprocessing
 
-Metagenome data
+1. Trimming
+Trimming is performed by Trimmomatic.  Trimmomatic trimming  
+3. Quality filtering
+4. Reference filtering
+
+
 - Trimmomatic v0.36
 - FASTX-Toolkit version 0.0.14 
 - cmpfastq_pe
 - Bowtie2 version 2.3.4.3
 
-Metatranscriptome data
+
+### Step2: Metatranscriptome preprocessing
+
+1. Trimming
+2. Quality filtering
+3. rRNA filtering
+4. Reference filtering
+
 - Trimmomatic v0.36
 - FASTX-Toolkit version 0.0.14 
 - cmpfastq_pe
 - SortMeRNA version 2.1
 - hisat2
 
-### Reconstruct metagenomes
+### Step3: Reconstruct metagenomes
 
+1. Assembly
+2. Scaffolding
+3. Merge
+4. Gene prediction
+5. Gene Annotation
 
-### Quantification of gene expression levels
+### Step4: Quantification of gene expression levels
 
+1. Mapping RNA reads to the reconstructed metagenome
+2. Count reads
 
-### Covariation analysis to predict unknown gene functions
+### Step5: Covariation analysis to predict unknown gene functions
+
+1. Unknown gene clustering
+2. covariation analysis
+
+## Overview of IMPIA output
 
