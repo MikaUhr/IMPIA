@@ -23,10 +23,19 @@ conda create -n IMPIA -f IMPIA_envs.yaml
 ```
 
 4. Download databases
+
 The following data is required.
 - Adapter sequence used for adapter removal in [Trimmomatic](http://www.usadellab.org/cms/?page=trimmomatic)
 - rRNA sequence used in [SortMeRNA](https://bioinfo.lifl.fr/RNA/sortmerna/)
-- Host genome used for reference filtering
+  - rfam-5.8s-database-id98.fasta
+  - rfam-5s-database-id98.fasta
+  - silva-arc-16s-id95.fasta
+  - silva-arc-23s-id98.fasta
+  - silva-bac-16s-id90.fasta
+  - silva-bac-23s-id98.fasta
+  - silva-euk-18s-id95.fasta
+  - silva-euk-28s-id98.fasta 
+- Host genome fasta used for reference filtering
 - [COG database](https://www.ncbi.nlm.nih.gov/research/cog-project/) used for gene annotation
 
 ### Step2: Configure workflow
