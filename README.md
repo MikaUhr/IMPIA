@@ -38,10 +38,39 @@ The following data is required.
 - Host genome fasta used for reference filtering
 - [COG database](https://www.ncbi.nlm.nih.gov/research/cog-project/) used for gene annotation
 
-### Step2: Configure workflow
-Adjust the file `config.yaml` to your setting.
+### Step2: Configure
+Adjust the file `config.yaml` to your setting, e.g.:
 
-### Step3: Execute workflow
+- Raw read directory
+  - dir_raw_metagenome - 
+  - dir_raw_metatranscriptome - 
+- Output directory
+  - dir_out -  
+- Memory and core
+  - memory_per_core
+  - threads
+- Tool parameters
+  - megahit_param
+    - k_min - 21
+    - k_max - 141
+    - k_step - 12
+    - prune_depth - 20
+  - sortmerna_param
+    - evalue - 1e-10
+  - merge
+    - hco - 50
+    - c - 50
+    - l - 1000
+    - mlength - 1000 
+- Database
+  - adapter: "data/TruSeq3-PE.fa"
+  - dir_sortmerna: "data/sortmerna" #Directory containing rRNA fasta files.
+  - host_genome:
+    - fasta - 
+    - index_bowtie2 - 
+    - index_hisat2 - 
+    
+### Step3: Execute the workflow
 Test your configuration by performing a dry-run via
 ```
 snakemake --use-conda --conda-frontend conda --configfile config.yaml --dry-run
@@ -99,6 +128,4 @@ Trimming is performed by Trimmomatic.  Trimmomatic trimming
 
 1. Unknown gene clustering
 2. covariation analysis
-
-## Overview of IMPIA output
 
