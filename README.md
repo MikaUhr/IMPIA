@@ -3,16 +3,6 @@ Integrated Metagenome-metatranscriptome Pipeline for Intra-intestinal Analysis (
 This approach allows gene expression levels to be compared among multi-site samples including those of unknown genes from metatranscriptome data. 
 In addition, spatial covariance analysis predicts the function of unknown genes.
 
-
-## Requirement
-### Preprocessing for metagenome data
-
-### Preprocessing for metatranscriptome data
-
-### Metagenome reconstruction
-
-### 
-
 ## Usage
 ### Step2: Installation
 To install IMPIA, you need conda.
@@ -33,12 +23,22 @@ conda create -n IMPIA -f IMPIA_envs.yaml
 ```
 
 4. Download databases
+The following data is required.
+- Adapter sequence used for adapter removal in [Trimmomatic](http://www.usadellab.org/cms/?page=trimmomatic)
+- rRNA sequence used in [SortMeRNA](https://bioinfo.lifl.fr/RNA/sortmerna/)
+- Host genome used for reference filtering
+- [COG database](https://www.ncbi.nlm.nih.gov/research/cog-project/) used for gene annotation
 
 ### Step2: Configure workflow
-1. Adjust the file `config.yaml` to your setting.
-2. 
+Adjust the file `config.yaml` to your setting.
 
 ### Step3: Execute workflow
+Test your configuration by performing a dry-run via
+```
+snakemake --use-conda --conda-frontend conda --configfile config.yaml --dry-run
+```
+
+Execute the workflow with
 ```
 snakemake --use-conda --conda-frontend conda --configfile config.yaml --core 4
 ```
