@@ -43,73 +43,85 @@ Adjust the config file to your setting, e.g.:
 
 1. `config_preprocess.yaml` 
 - Raw read directory
-  - dir_raw_metagenome - 
-  - dir_raw_metatranscriptome - 
+  - dir_raw_metagenome - set the directory where the metagenomic raw read data is stored. Performs pre-processing on all fastq files in the directory.
+  - dir_raw_metatranscriptome - set the directory where the metatranscriptomic raw read data is stored. Performs pre-processing on all fastq files in the directory.
 - Output directory
-  - dir_out -  
+  - dir_out - set output directory.
 - Memory and core
-  - memory_per_core
-  - threads
+  - memory_per_core - set the size of the RAM of one core of your nodes (GB) (default: 8).
+  - threads - set this to the maximum number of cores you want to be using in a run (default: 4).
 - Tool parameters
-  - megahit_param
-    - k_min - 21
-    - k_max - 141
-    - k_step - 12
-    - prune_depth - 20
-  - sortmerna_param
-    - evalue - 1e-10
+  - megahit_param - the assembly parameter in MEGAHIT
+    - k_min - minimum kmer size (<= 255), must be odd number (default: 21).
+    - k_max - maximum kmer size (<= 255), must be odd number (default: 141).
+    - k_step - increment of kmer size of each iteration (<= 28), must be even number (default: 12).
+    - prune_depth - remove unitigs with avg kmer depth less than this value (default: 20).
+  - sortmerna_param - the rRNA filtering parameter in SortMeRNA
+    - evalue - maximum e-value to report alignments (default: 1e-10).
 - Database
-  - adapter: "data/TruSeq3-PE.fa"
-  - dir_sortmerna: "data/sortmerna" #Directory containing rRNA fasta files.
-  - host_genome:
-    - fasta - 
-    - index_bowtie2 - 
-    - index_hisat2 - 
+  - adapter - set the fasta file of adapter sequence to be trimmed by Trimmomatic.
+  - dir_sortmerna - set the directory containing rRNA fasta files.
+  - host_genome
+    - fasta - set the host genome you want to remove from the read data.
+    - index_bowtie2 - set the Bowtie2 index of the host genome.
+    - index_hisat2 - set the HISAT2 index of the host genome.
 
 2. `config_merge.yml`
 - Contig 
-  - contig1 - 
-  - contig2 - 
+  - contig1 - set the first contig to be merged.
+  - contig2 - set the second contig to be merged.
 - Output directory
-  - dir_out -
+  - dir_out - set output directory.
 - Tool parameter
-  - merge
-    - hco - 50
-    - c - 50
-    - l - 1000
-    - mlength - 1000 
+  - merge - the merge parameter in Quickmerge
+    - hco - the quickmerge hco parameter (default: 50)
+    - c - the quickmerge c parameter (default: 50)
+    - l - minimum seed contig length to be merged (default: 1000)
+    - mlength - set the merging length cutoff necessary for use in quickmerge (default: 1000)
 
 3. `config_gene_expression.yml`
-
 - Reconstructed metagenome
   - reconstructed_metagenome
-    - fasta - 
-    - index_bowtie2 - 
+    - fasta - set the fasta file of metagenomic sequences reconstructed by merging.
+    - index_bowtie2 - set the Bowtie2 index of the reconstructed metagenome.
 - Output directory
-  - dir_out - 
+  - dir_out - set output directory.
 - Memory and core
-  - memory_per_core: 8
-  - threads: 4
+  - memory_per_core - set the size of the RAM of one core of your nodes (GB) (default: 8).
+  - threads - set this to the maximum number of cores you want to be using in a run (default: 4).
 - Tool parameter
-  - gene_clustering
-    - cluster_mode: 2
-    - cov_mode: 1
-    - c: 0.9
-    - s: 7
-    - kmer: 20
-
-# Database
-COG_fasta: ""
+  - gene_clustering - the gene clustering parameter in MMseqs2
+    - cluster_mode: 0: Setcover, 1: connected component, 2: Greedy clustering by sequence length  3: Greedy clustering by sequence length (low mem) (default: 2)
+    - cov_mode: 0: coverage of query and target, 1: coverage of target, 2: coverage of query 3: target seq. length needs be at least x% of query length, 4: query seq. length needs be at least x% of target length (default: 1)
+    - c: list matches above this fraction of aligned (covered) residues (default: 0.9)
+    - s: sensitivity will be automatically determined but can be adjusted (default: 7)
+    - kmer: kmer per sequence (default: 20)
+- Database
+  - COG_fasta - set the fasta file of COG database contains RefSeq accession codes for all proteins with assigned COG domains.
 
 ### Step3: Execute the workflow
-Test your configuration by performing a dry-run via
+
+Note that a dry-run must be performed with `--dry-run` to test the configuration before running each workflow.
+
+
+Execute the workflows from metagenome preprocessing to scaffolding with
 ```
-snakemake --use-conda --conda-frontend conda --configfile config.yaml --dry-run
+snakemake -s metagenome_preprocessing_scaffolding.smk --use-conda --conda-frontend conda --configfile config/config_preprocess.yaml --core 4
 ```
 
-Execute the workflow with
+Execute the workflows for metatranscriptome preprocessing with
 ```
-snakemake --use-conda --conda-frontend conda --configfile config.yaml --core 4
+snakemake -s metatranscriptome_preprocessing.smk --use-conda --conda-frontend conda --configfile config/config_preprocess.yaml --core 4
+```
+
+Execute the workflows for merging with
+```
+snakemake -s merge.smk --use-conda --conda-frontend conda --configfile config/config_merge.yaml --core 4
+```
+
+Execute the workflows from quantification of gene expression level to prediction of unknown function genes by covariation analysis with
+```
+snakemake -s gene_expression.smk --use-conda --conda-frontend conda --configfile config/config_gene_expression.yaml --core 4
 ```
 
 
@@ -118,10 +130,8 @@ snakemake --use-conda --conda-frontend conda --configfile config.yaml --core 4
 ### Step1: Metagenome preprocessing
 
 1. Trimming
-Trimming is performed by Trimmomatic.  Trimmomatic trimming  
-3. Quality filtering
-4. Reference filtering
-
+2. Quality filtering
+3. Reference filtering
 
 - Trimmomatic v0.36
 - FASTX-Toolkit version 0.0.14 
@@ -158,5 +168,4 @@ Trimming is performed by Trimmomatic.  Trimmomatic trimming
 ### Step5: Covariation analysis to predict unknown gene functions
 
 1. Unknown gene clustering
-2. covariation analysis
-
+2. Covariation analysis
