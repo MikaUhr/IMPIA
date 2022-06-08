@@ -39,8 +39,9 @@ The following data is required.
 - [COG database](https://www.ncbi.nlm.nih.gov/research/cog-project/) used for gene annotation
 
 ### Step2: Configure
-Adjust the file `config.yaml` to your setting, e.g.:
+Adjust the config file to your setting, e.g.:
 
+1. `config_preprocess.yaml` 
 - Raw read directory
   - dir_raw_metagenome - 
   - dir_raw_metatranscriptome - 
@@ -57,11 +58,6 @@ Adjust the file `config.yaml` to your setting, e.g.:
     - prune_depth - 20
   - sortmerna_param
     - evalue - 1e-10
-  - merge
-    - hco - 50
-    - c - 50
-    - l - 1000
-    - mlength - 1000 
 - Database
   - adapter: "data/TruSeq3-PE.fa"
   - dir_sortmerna: "data/sortmerna" #Directory containing rRNA fasta files.
@@ -69,7 +65,42 @@ Adjust the file `config.yaml` to your setting, e.g.:
     - fasta - 
     - index_bowtie2 - 
     - index_hisat2 - 
-    
+
+2. `config_merge.yml`
+- Contig 
+  - contig1 - 
+  - contig2 - 
+- Output directory
+  - dir_out -
+- Tool parameter
+  - merge
+    - hco - 50
+    - c - 50
+    - l - 1000
+    - mlength - 1000 
+
+3. `config_gene_expression.yml`
+
+- Reconstructed metagenome
+  - reconstructed_metagenome
+    - fasta - 
+    - index_bowtie2 - 
+- Output directory
+  - dir_out - 
+- Memory and core
+  - memory_per_core: 8
+  - threads: 4
+- Tool parameter
+  - gene_clustering
+    - cluster_mode: 2
+    - cov_mode: 1
+    - c: 0.9
+    - s: 7
+    - kmer: 20
+
+# Database
+COG_fasta: ""
+
 ### Step3: Execute the workflow
 Test your configuration by performing a dry-run via
 ```
