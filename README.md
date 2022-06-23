@@ -19,7 +19,7 @@ cd IMPIA
 
  3.  Create the environment to be execute this pipeline.
 ```
-conda create -n IMPIA -f IMPIA_envs.yaml
+conda create -n IMPIA -f IMPIA_env.yml
 ```
 
 4. Download databases
@@ -38,10 +38,14 @@ The following data is required.
 - Host genome fasta used for reference filtering
 - [COG database](https://www.ncbi.nlm.nih.gov/research/cog-project/) used for gene annotation
 
-### Step2: Configure
-Adjust the config file to your setting, e.g.:
+5. Install tools
+Install [MetaGeneMark v3.38](http://topaz.gatech.edu/genemark/license_download.cgi) and set the path.
 
-1. `config_preprocess.yaml` 
+
+### Step2: Configure
+Adjust the four config files to your setting, e.g.:
+
+1. `config_processing.yml` 
 - Raw read directory
   - dir_raw_metagenome - set the directory where the metagenomic raw read data is stored. Performs pre-processing on all fastq files in the directory.
   - dir_raw_metatranscriptome - set the directory where the metatranscriptomic raw read data is stored. Performs pre-processing on all fastq files in the directory.
@@ -80,6 +84,8 @@ Adjust the config file to your setting, e.g.:
     - mlength - set the merging length cutoff necessary for use in quickmerge (default: 1000)
 
 3. `config_gene_expression.yml`
+- Individual
+  - individual_name - set the individual name.
 - Reconstructed metagenome
   - reconstructed_metagenome
     - fasta - set the fasta file of metagenomic sequences reconstructed by merging.
@@ -90,14 +96,38 @@ Adjust the config file to your setting, e.g.:
   - memory_per_core - set the size of the RAM of one core of your nodes (GB) (default: 8).
   - threads - set this to the maximum number of cores you want to be using in a run (default: 4).
 - Tool parameter
+  - gene_annotation - diamond options
+    - evalue - maximum e-value to report alignments (defaul: 1e-10)
+    - query_cover - minimum query cover% to report an alignment (default: 85)
+    - min_orf - ignore translated sequences without an open reading frame of at least this length (default: 100)
+    - directory_tmp - set the directory for temporary files (defauld: "/dev/shm").
+- Database
+  - COG
+    - COG_fasta - set the fasta file of COG database contains RefSeq accession codes for all proteins with assigned COG domains.
+    - COG_csv - set the csv file of COG database. Contains list of orthology domains. Comma-delimited, format: `<domain-id>, <genome-name>, <protein-id>,<protein-length>, <domain-start>, <domain-end>, <COG-id>, <membership-class>,`
+    - COG_diamond - set output path of the DIAMOND database to be built from the FASTA file.
+
+4. `config_predict_genefunctions.yml`
+- Set directory -
+  - dir_input - set input directory. Move all three of the following files (All (the three files) x (the number of individuals)) to the input directory: `{dir_our}/gene_annotation/annotation_cogid_{individual}.tsv`, `{dir_our}/gene_annotation/unknown_aminoacid_{individual}.fasta`, `{dir_our}/rna_mapping/tpm_join_{individual}.txt`. These files are included under the output directory `dir_out` configured in `config_gene_expression.yml`.
+  - dir_output - set output directory.
+- Memory and core
+  - memory_per_core - set the size of the RAM of one core of your nodes (GB) (default: 8).
+  - threads - set this to the maximum number of cores you want to be using in a run (default: 4).
+- Model parameter 
   - gene_clustering - the gene clustering parameter in MMseqs2
     - cluster_mode: 0: Setcover, 1: connected component, 2: Greedy clustering by sequence length  3: Greedy clustering by sequence length (low mem) (default: 2)
     - cov_mode: 0: coverage of query and target, 1: coverage of target, 2: coverage of query 3: target seq. length needs be at least x% of query length, 4: query seq. length needs be at least x% of target length (default: 1)
     - c: list matches above this fraction of aligned (covered) residues (default: 0.9)
     - s: sensitivity will be automatically determined but can be adjusted (default: 7)
     - kmer: kmer per sequence (default: 20)
-- Database
-  - COG_fasta - set the fasta file of COG database contains RefSeq accession codes for all proteins with assigned COG domains.
+  - spatial_covariation
+    - pseudo_expression: 0.001
+    - variance: 1.0
+    - b: 2.0
+    - distance: ""
+    - L_threshold: 0.885
+
 
 ### Step3: Execute the workflow
 
