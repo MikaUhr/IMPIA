@@ -1,0 +1,13 @@
+# Contig
+contig1: ""
+contig2: ""
+
+# Output directory
+dir_out: ""
+
+# Tool parameter
+merge:
+    hco: 50
+    c: 50
+    l: 1000
+    mlength: 1000

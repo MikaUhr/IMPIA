@@ -1,0 +1,22 @@
+# Set directory
+dir_input: ""
+dir_output: ""
+
+# Memory and core
+memory_per_core: 8
+threads: 4
+
+# Model parameter
+gene_clustering:
+    cluster_mode: 2
+    cov_mode: 1
+    c: 0.9
+    s: 7
+    kmer: 20
+
+spatial_covariation:
+    pseudo_expression: 0.001
+    variance: 1.0
+    b: 2.0
+    distance: ""
+    L_threshold: 0.885

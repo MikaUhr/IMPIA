@@ -1,0 +1,28 @@
+# Raw read directory
+dir_raw_metagenome: ""
+dir_raw_metatranscriptome: "" 
+
+# Output directory
+dir_out: ""
+
+# Memory and core
+memory_per_core: 8
+threads: 4
+
+# Tool parameters
+megahit_param:
+    k_min: 21
+    k_max: 141
+    k_step: 12
+    prune_depth: 20
+sortmerna_param:
+    evalue: 1e-10
+
+# Database
+adapter: "data/TruSeq3-PE.fa"
+dir_sortmerna: "data/sortmerna" #Directory containing rRNA fasta files.
+host_genome:
+    fasta: "data/host_genome.fasta"
+    index_bowtie2: "data/bowtie2_index/host"
+    index_hisat2: "data/hisat2_index/host"
+

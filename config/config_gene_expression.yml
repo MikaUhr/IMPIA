@@ -1,0 +1,32 @@
+# Individual
+individual_name: "individual1"
+
+# Reconstructed metagenome
+reconstructed_metagenome:
+    fasta: ""
+    index_bowtie2: ""
+
+# Directory containing the filterd metatranscriptome fastq files
+dir_metatranscriptome: ""
+
+# Output directory
+dir_out: ""
+
+# Memory and core
+memory_per_core: 8
+threads: 4
+
+# Tool parameter
+gene_annotation:
+    evalue: "1e-10"
+    query_cover: 85
+    min_orf: 100
+    directory_tmp: "/dev/shm"
+
+# Database
+metagenemark_mod: ""
+COG:
+    COG_fasta: ""
+    COG_csv: ""
+    COG_diamond: ""
+
