@@ -47,8 +47,8 @@ Adjust the four config files to your setting, e.g.:
 
 1. `config_processing.yml` 
 - Raw read directory
-  - dir_raw_metagenome - set the directory where the metagenomic raw read data is stored. Performs pre-processing on all fastq files in the directory.
-  - dir_raw_metatranscriptome - set the directory where the metatranscriptomic raw read data is stored. Performs pre-processing on all fastq files in the directory.
+  - dir_raw_metagenome - set the directory where the metagenomic raw read data is stored. Performs pre-processing on all fastq files in the directory. The fastq file names should be '{sample}_1.fastq' and '{sample}_2.fastq'. 
+  - dir_raw_metatranscriptome - set the directory where the metatranscriptomic raw read data is stored. Performs pre-processing on all fastq files in the directory. The fastq file names should be '{sample}_1.fastq' and '{sample}_2.fastq'.
 - Output directory
   - dir_out - set output directory.
 - Memory and core
@@ -116,17 +116,17 @@ Adjust the four config files to your setting, e.g.:
   - threads - set this to the maximum number of cores you want to be using in a run (default: 4).
 - Model parameter 
   - gene_clustering - the gene clustering parameter in MMseqs2
-    - cluster_mode: 0: Setcover, 1: connected component, 2: Greedy clustering by sequence length  3: Greedy clustering by sequence length (low mem) (default: 2)
-    - cov_mode: 0: coverage of query and target, 1: coverage of target, 2: coverage of query 3: target seq. length needs be at least x% of query length, 4: query seq. length needs be at least x% of target length (default: 1)
-    - c: list matches above this fraction of aligned (covered) residues (default: 0.9)
-    - s: sensitivity will be automatically determined but can be adjusted (default: 7)
-    - kmer: kmer per sequence (default: 20)
-  - spatial_covariation
-    - pseudo_expression: 0.001
-    - variance: 1.0
-    - b: 2.0
-    - distance: ""
-    - L_threshold: 0.885
+    - cluster_mode - 0: Setcover, 1: connected component, 2: Greedy clustering by sequence length  3: Greedy clustering by sequence length (low mem) (default: 2)
+    - cov_mode - 0: coverage of query and target, 1: coverage of target, 2: coverage of query 3: target seq. length needs be at least x% of query length, 4: query seq. length needs be at least x% of target length (default: 1)
+    - c - list matches above this fraction of aligned (covered) residues (default: 0.9)
+    - s - sensitivity will be automatically determined but can be adjusted (default: 7)
+    - kmer - kmer per sequence (default: 20)
+  - spatial_covariation - the spatial covariation model calculate the bivariate spatial association measure (L statistic) of expression levels between all gene cluster pairs.
+    - pseudo_expression - this pseudo-expression value is added when the gene expression level is 0 (default: 0.001). If this value is set to 0, gene clusters containing samples with zero expression levels are removed.
+    - variance - gene clusters where the variance of expression levels between sites is greater than this value are used in the analysis (default: 1.0).
+    - b - the distance friction coefficient of weight to calculate L statistic (default: 2.0).
+    - distance - the distance of the intestinal sites. Distance should be entered with the most proximal position as 0, separated by commas, e,g: "0,10,15" (do not include spaces).
+    - L_threshold - when the bivariate spatial association measure (L statistic) exceeds this threshold, the gene cluster pair is defined as a covariate gene (default: 0.885)
 
 
 ### Step3: Execute the workflow
@@ -136,28 +136,33 @@ Note that a dry-run must be performed with `--dry-run` to test the configuration
 
 Execute the workflows from metagenome preprocessing to scaffolding with
 ```
-snakemake -s metagenome_preprocessing_scaffolding.smk --use-conda --conda-frontend conda --configfile config/config_preprocess.yaml --core 4
+snakemake -s rules/metagenome_processing.smk --use-conda --conda-frontend conda --configfile config/config_processing.yml --core 4
 ```
 
 Execute the workflows for metatranscriptome preprocessing with
 ```
-snakemake -s metatranscriptome_preprocessing.smk --use-conda --conda-frontend conda --configfile config/config_preprocess.yaml --core 4
+snakemake -s rules/metatranscriptome_processing.smk --use-conda --conda-frontend conda --configfile config/config_processing.yml --core 4
 ```
 
 Execute the workflows for merging with
 ```
-snakemake -s merge.smk --use-conda --conda-frontend conda --configfile config/config_merge.yaml --core 4
+snakemake -s rules/merge.smk --use-conda --conda-frontend conda --configfile config/config_merge.yml --core 4
 ```
 
 Execute the workflows from quantification of gene expression level to prediction of unknown function genes by covariation analysis with
 ```
-snakemake -s gene_expression.smk --use-conda --conda-frontend conda --configfile config/config_gene_expression.yaml --core 4
+snakemake -s rules/gene_expression.smk --use-conda --conda-frontend conda --configfile config/config_gene_expression.yml --core 4
+```
+
+Execute the workflows for predicting the functions of unknown genes by covariation analysis incorporating bivariate spatial relevance with
+```
+snakemake -s rules/predict_genefunctions.smk --use-conda --conda-frontend conda --configfile config/config_predict_genefunctions.yml --core 4
 ```
 
 
 ## Overview of IMPIA steps
 
-### Step1: Metagenome preprocessing
+### Step1: Metagenome processing
 
 1. Trimming
 2. Quality filtering
