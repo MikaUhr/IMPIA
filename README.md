@@ -4,7 +4,7 @@ This approach allows gene expression levels to be compared among multi-site samp
 In addition, spatial covariance analysis predicts the function of unknown genes.
 
 ## Usage
-### Step2: Installation
+### Step1: Installation
 To install IMPIA, you need conda.
 
  1. Clone this repository.
@@ -22,9 +22,7 @@ cd IMPIA
 conda create -n IMPIA -f IMPIA_env.yml
 ```
 
-4. Download databases
-
-The following data is required.
+4. Download the following data:
 - Adapter sequence used for adapter removal in [Trimmomatic](http://www.usadellab.org/cms/?page=trimmomatic)
 - rRNA sequence used in [SortMeRNA](https://bioinfo.lifl.fr/RNA/sortmerna/)
   - rfam-5.8s-database-id98.fasta
@@ -38,8 +36,7 @@ The following data is required.
 - Host genome fasta used for reference filtering
 - [COG database](https://www.ncbi.nlm.nih.gov/research/cog-project/) used for gene annotation
 
-5. Install tools not included in bioconda
-Install [MetaGeneMark v3.38](http://topaz.gatech.edu/genemark/license_download.cgi) and set the path.
+5. Install [MetaGeneMark v3.38](http://topaz.gatech.edu/genemark/license_download.cgi) not included in bioconda and set the path.
 
 
 ### Step2: Configure
@@ -47,8 +44,8 @@ Adjust the four config files to your setting, e.g.:
 
 1. `config_processing.yml` 
 - Raw read directory
-  - dir_raw_metagenome - set the directory where the metagenomic raw read data is stored. Performs pre-processing on all fastq files in the directory. The fastq file names should be '{sample}_1.fastq' and '{sample}_2.fastq'. 
-  - dir_raw_metatranscriptome - set the directory where the metatranscriptomic raw read data is stored. Performs pre-processing on all fastq files in the directory. The fastq file names should be '{sample}_1.fastq' and '{sample}_2.fastq'.
+  - dir_raw_metagenome - set the directory where the metagenomic raw read data is stored. Performs pre-processing on all fastq files in this directory. The fastq file names should be '{sample}_1.fastq' and '{sample}_2.fastq'. 
+  - dir_raw_metatranscriptome - set the directory where the metatranscriptomic raw read data is stored. Performs pre-processing on all fastq files in this directory. The fastq file names should be '{sample}_1.fastq' and '{sample}_2.fastq'.
 - Output directory
   - dir_out - set output directory.
 - Memory and core
@@ -72,12 +69,12 @@ Adjust the four config files to your setting, e.g.:
 
 2. `config_merge.yml`
 - Contig 
-  - contig1 - set the first contig to be merged.
-  - contig2 - set the second contig to be merged.
+  - contig1 - set the first contig file to be merged.
+  - contig2 - set the second contig file to be merged.
 - Output directory
   - dir_out - set output directory.
 - Tool parameter
-  - merge - the merge parameter in Quickmerge
+  - merge - the merge parameter in quickmerge
     - hco - the quickmerge hco parameter (default: 50)
     - c - the quickmerge c parameter (default: 50)
     - l - minimum seed contig length to be merged (default: 1000)
@@ -109,7 +106,7 @@ Adjust the four config files to your setting, e.g.:
 
 4. `config_predict_genefunctions.yml`
 - Set directory -
-  - dir_input - set input directory. Move all three of the following files (All (the three files) x (the number of individuals)) to the input directory: `{dir_our}/gene_annotation/annotation_cogid_{individual}.tsv`, `{dir_our}/gene_annotation/unknown_aminoacid_{individual}.fasta`, `{dir_our}/rna_mapping/tpm_join_{individual}.txt`. These files are included under the output directory `dir_out` configured in `config_gene_expression.yml`.
+  - dir_input - set input directory. Move all three of the following files (All (the three files) x (the number of individuals)) to this directory: `{dir_our}/gene_annotation/annotation_cogid_{individual}.tsv`, `{dir_our}/gene_annotation/unknown_aminoacid_{individual}.fasta`, `{dir_our}/rna_mapping/tpm_join_{individual}.txt`. These files are included under the output directory `dir_out` configured in `config_gene_expression.yml`.
   - dir_output - set output directory.
 - Memory and core
   - memory_per_core - set the size of the RAM of one core of your nodes (GB) (default: 8).
@@ -164,49 +161,49 @@ snakemake -s rules/predict_genefunctions.smk --use-conda --conda-frontend conda 
 
 ### Metagenome processing
 
-1. Trimming
+1. Trimming - 
 [Trimmomatic](http://www.usadellab.org/cms/?page=trimmomatic) removes the defined adapter sequence and trim low-quality regions.
-2. Quality filtering
+2. Quality filtering - 
 [FASTX-Toolkit](http://hannonlab.cshl.edu/fastx_toolkit/) eliminates low quality reads. 
-3. Reference filtering
+3. Reference filtering - 
 Potential host contaminants are filtered by removing reads with sequences aligned to the defined host genome using [Bowtie2](http://bowtie-bio.sourceforge.net/bowtie2/index.shtml).
-4. Assembly
+4. Assembly - 
 The metagenome reads are assembled by [MEGAHIT](https://www.metagenomics.wiki/tools/assembly/megahit).
-5. Scaffolding
-The contigs were scaffolded by [OPERA-LG](https://sourceforge.net/projects/operasf/) using paired-end read information.
+5. Scaffolding - 
+The contigs are scaffolded by [OPERA-LG](https://sourceforge.net/projects/operasf/) using paired-end read information.
 
 ### Metatranscriptome processing
 
-1. Trimming
+1. Trimming - 
 Same as the metagenome processing.
-2. Quality filtering
+2. Quality filtering - 
 Same as the metagenome processing.
-3. rRNA filtering
+3. rRNA filtering - 
 [SortMeRNA](https://bioinfo.lifl.fr/RNA/sortmerna/) filter rRNA reads from metatranscriptome data by aligning reads against rRNA database.
-4. Reference filtering
+4. Reference filtering - 
 Potential host contaminants are filtered by removing reads with sequences aligned to the defined host genome using [hisat2](http://daehwankimlab.github.io/hisat2/).
 
 ### Merging scaffolds between sites
 the scaffolds are merged among sites using [quickmerge](https://github.com/mahulchak/quickmerge).
 
 ### Quantification of gene expression levels
-1. Gene prediction
+1. Gene prediction - 
 Gene-coding regions are predicted in the metagenomic sequences by [MetaGeneMark](http://topaz.gatech.edu/genemark/license_download.cgi).
-2. Gene Annotation
-The predicted genes are annotate according to orthologous groups in [COG database](https://www.ncbi.nlm.nih.gov/research/cog-project/) using [DIAMOND](https://github.com/bbuchfink/diamond).
-3. Mapping RNA reads to the reconstructed metagenome
+2. Gene Annotation - 
+The predicted genes are annotated according to orthologous groups in [COG database](https://www.ncbi.nlm.nih.gov/research/cog-project/) using [DIAMOND](https://github.com/bbuchfink/diamond).
+3. Mapping RNA reads to the reconstructed metagenome - 
 mRNA reads are mapped to the metagenomic reference sequences by [Bowtie2](http://bowtie-bio.sourceforge.net/bowtie2/index.shtml).
-4. Quantification of gene expression levels
+4. Quantification of gene expression levels - 
 The number of mRNA reads was counted by [HTSeq](https://htseq.readthedocs.io/en/master/) to quantify the gene expression level. 
-The read counts are converted to TPMs by `scripts/TPM.py`.
+The read counts are converted to TPM by `scripts/TPM.py`.
 Namely, The read counts are first normalized by the gene length (per kilobase), and then gene-length normalized values are divided by the sum of the gene-length normalized values and multiplied by 10^6.
 
 
 ### Covariation analysis to predict unknown gene functions
-1. Generate gene clustering
+1. Generate gene clustering - 
 For known genes, gene clusters are generated by COG ID.
 The Unknown genes are grouped into gene clusters by protein sequence similarity using [MMSEQS2](https://github.com/soedinglab/MMseqs2).
-2. Covariation analysis
+2. Covariation analysis - 
 The functions of unknown genes is predicted by covariation analysis incorporating spatial relevance.
 The bivariate spatial association measure (L statistic value) is calculated to detect covarying gene pairs in expression levels in samples. 
 This analysis is based on the assumption that functionally similar genes are covariant in their expression levels.
